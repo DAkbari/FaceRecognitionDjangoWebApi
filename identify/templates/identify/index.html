@@ -27,6 +27,11 @@
                                 <span class="glyphicon glyphicon-star {% if person.is_favorite %}active{% endif %}"></span>
                             </a>
 
+                            <!--Update Person Info-->
+                            <a href="{% url 'identify:person-update' person.id%}" class="btn btn-default">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+
                         </div>
                     </div>
                 </div>

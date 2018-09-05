@@ -5,7 +5,7 @@ from django.urls import reverse
 class Person(models.Model):
     firstName = models.CharField(max_length=200)
     lastName = models.CharField(max_length=200)
-    faceEncode = models.FileField()
+    faceEncode = models.CharField(max_length=3000)
     facePicture = models.FileField()
     lastLoginPicture = models.FileField()
     code = models.CharField(max_length=100)
