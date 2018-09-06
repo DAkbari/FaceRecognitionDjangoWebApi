@@ -4,8 +4,8 @@ import numpy
 
 
 def calculate(facePicture):
-    Data_face_encoding = face_recognition.face_encodings(facePicture)[0]
-    numpy.save()
+
+
 
     for file in os.listdir("C:/FaceDetect/TrainData"):
         print(file)

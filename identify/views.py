@@ -1,10 +1,14 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from identify.models import Person
 from django.views import generic
 from django.urls import reverse_lazy
 from django.views.generic import View
-from .forms import UserForm
+from identify import forms
+
+import numpy
+import face_recognition
 
 
 # Create your views here.
@@ -24,8 +28,17 @@ class DetailView(generic.DeleteView):
     template_name = 'identify/detail.html'
 
 
+# class Capture(View):
+#     form_class = forms.ImageForm
+#     template_name = "identify/capture.html"
+#
+#     def get(self, request):
+#         form = self.form_class(None)
+#         return render(request, self.template_name, {'form': form})
+
+
 class PersonCreate(View):
-    form_class = UserForm
+    form_class = forms.UserForm
     template_name = 'identify/new_person_form.html'
 
     #display a blink form
@@ -35,14 +48,20 @@ class PersonCreate(View):
 
         # process form data
     def post(self, request):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
             # clean normalized data
-            facePicture = form.cleaned_data['username']
-            FName = form.cleaned_data['firstName']
-            LName = form.cleaned_data['lastName']
-            code = form.cleaned_data['code']
+
+            facePicture = form.cleaned_data['facePicture']
+            Data_face_image = face_recognition.load_image_file(facePicture)
+
+            try:
+                user.faceEncode = face_recognition.face_encodings(Data_face_image)[0]
+
+            except:
+                print("error")
+
             user.save()
 
         return render(request, self.template_name, {'form': form})
@@ -56,3 +75,7 @@ class PersonUpdate(UpdateView):
 class PersonDelete(DeleteView):
     model = Person
     success_url = reverse_lazy('identify:index')
+
+
+def capture(request):
+    return render(request, 'identify/capture.html')

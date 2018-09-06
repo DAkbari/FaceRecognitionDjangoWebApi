@@ -10,6 +10,9 @@ urlpatterns = [
     # /identify/new
     url(r'^new/$', views.PersonCreate.as_view(), name='new'),
 
+    # /identify/capture
+    url(r'^capture/$', views.capture, name='new'),
+
     # /identify/71/
     url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name="detail"),
 
@@ -19,6 +22,6 @@ urlpatterns = [
     # /music/album/2/delete/
     url(r'album/(?P<pk>[0-9]+)/delete/$', views.PersonDelete.as_view(), name="person-delete")
 
-    #
+
 
 ]

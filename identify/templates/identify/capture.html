@@ -1,0 +1,15 @@
+{% extends 'identify/base.html' %}
+{% block title %} User Registration {% endblock %}
+{#{% block albums_active %} active {% endblock %}#}
+{% block body %}
+    <div id="camera">
+
+    </div>
+    <script>
+        var camera = new JpegCamera("camera")
+        var snapshot = camera.capture();
+        snapshot.show();
+
+    </script>
+
+{% endblock %}
