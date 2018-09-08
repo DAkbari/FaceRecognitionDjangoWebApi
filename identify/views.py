@@ -6,6 +6,9 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.views.generic import View
 from identify import forms
+import base64
+from django.core.files.base import ContentFile
+from identify.FaceDetection import faceDetection
 
 import numpy
 import face_recognition
@@ -78,4 +81,16 @@ class PersonDelete(DeleteView):
 
 
 def capture(request):
-    return render(request, 'identify/capture.html')
+
+    if request.method == 'GET':
+        return render(request, 'identify/capture.html')
+
+    if request.method == 'POST':
+        data = request.POST['imgBase64']
+        format, imgstr = data.split(';base64,')
+        ext = format.split('/')[-1]
+        data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+        personellCodes = Person.objects.all()
+        faceDetection(data, )
+        return HttpResponse("successful")
+

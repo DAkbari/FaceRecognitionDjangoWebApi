@@ -1,15 +1,45 @@
 {% extends 'identify/base.html' %}
 {% block title %} User Registration {% endblock %}
+
 {#{% block albums_active %} active {% endblock %}#}
+
+{% block head %}
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static 'Webcam/jpeg_camera_with_dependencies.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'identify/capture.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'identify/capture.css' %}">
+{% endblock %}
+
 {% block body %}
-    <div id="camera">
+    {% csrf_token %}
+    <p>
+        This is a demonstration page for
+        <a href="https://amw.github.io/jpeg_camera/doc/">JpegCamera library</a>.
+    </p>
+
+    <div id="camera_info">Camera resolution: 1280x720</div>
+    <div id="stream_stats">Mean luminance = 113; Standard Deviation = 73</div>
+
+    <div id="camera" style="width: 250px; height: 350px">
+
+    </div><br>
+
+    <button id="take_snapshots" style="display: inline-block;">Take more snapshots</button>
+    <button id="show_stream" style="display: inline-block;">Show stream</button><br>
+
+    <div id="snapshots">
 
     </div>
-    <script>
-        var camera = new JpegCamera("camera")
-        var snapshot = camera.capture();
-        snapshot.show();
 
-    </script>
+    <button id="discard_snapshot" style="display: inline-block;">Discard snapshot</button>
+    <button id="upload_snapshot" style="display: inline-block;">Upload to URL</button><br>
+
+    <input type="text" id="api_url" placeholder="https://example.com/upload" style="display: inline-block;"><br>
+
+{#    <img src="loader.gif" id="loader">#}
+    <div id="upload_status"></div>
+    <div id="upload_result"></div>
+
+
 
 {% endblock %}

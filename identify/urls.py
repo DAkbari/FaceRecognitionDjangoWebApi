@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^new/$', views.PersonCreate.as_view(), name='new'),
 
     # /identify/capture
-    url(r'^capture/$', views.capture, name='new'),
+    url(r'^capture/$', views.capture, name='capture'),
 
     # /identify/71/
     url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name="detail"),
