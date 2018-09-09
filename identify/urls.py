@@ -13,6 +13,9 @@ urlpatterns = [
     # /identify/capture
     url(r'^capture/$', views.capture, name='capture'),
 
+    # /identify/capture_api
+    url(r'^capture_api/$', views.capture_api.as_view(), name='capture_api'),
+
     # /identify/71/
     url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name="detail"),
 

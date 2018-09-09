@@ -10,7 +10,9 @@ from identify.models import Person
 def faceDetection(picture):
     treshold = 0.6
     known_face_encodings = list()
+    detectedIDs = list()
 
+    Ids = [i[0] for i in Person.objects.values_list('id')]
     personellCodes = [i[0] for i in Person.objects.values_list('code')]
     encodes = [i[0] for i in Person.objects.values_list('faceEncode')]
     fNames = [i[0] for i in Person.objects.values_list('firstName')]
@@ -21,7 +23,11 @@ def faceDetection(picture):
             known_face_encodings.append(numpy.load("media/" + encode))
     except Exception as e:
         print(str(e))
+
+    people = list()
     names = list()
+    indices = list()
+
     # Load an image with an unknown face
     try:
         unknown_image = face_recognition.load_image_file(picture)
@@ -34,6 +40,7 @@ def faceDetection(picture):
     for (top, right, bottom, left), face_encoding in zip(face_locations, known_face_encodings):
         # See if the face is a match for the known face(s)
         name = "Unknown"
+
         try:
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             if face_distances.min() < treshold:
@@ -41,11 +48,13 @@ def faceDetection(picture):
                 # If a match was found in known_face_encodings, just use the first one.
                 if len(indices) == 1:
                     name = fNames[indices[0]] + " " + lNames[indices[0]]
+                    id = Ids[indices[0]]
 
         except:
             print("Error in measuring distance!")
 
+        detectedIDs.append(id)
         names.append(name)
 
-    return ','.join(names)
+    return ','.join(names), detectedIDs
 

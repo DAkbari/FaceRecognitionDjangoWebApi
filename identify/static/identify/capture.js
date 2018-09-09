@@ -65,6 +65,13 @@ $(function () {
             $("#upload_status, #upload_result").html("");
         };
 
+        var upload_snapshot_json = function () {
+            var canvas = $(".item.selected");
+            if (!canvas)
+                return;
+            $('#facePicJson').val(canvas[0].toDataURL())
+            $('#detectJson').submit()
+        }
         var upload_snapshot = function () {
             var canvas = $(".item.selected");
             if (!canvas)
@@ -165,13 +172,15 @@ $(function () {
         });
         $("#snapshots").on("click", ".item", select_snapshot);
         $("#upload_snapshot").click(upload_snapshot);
+        $("#upload_snapshot_json").click(upload_snapshot_json);
         $("#discard_snapshot").click(discard_snapshot);
         $("#show_stream").click(show_stream);
 
         var options = {
-            shutter_ogg_url: "../identify/static/Webcam/shutter.ogg",
-            shutter_mp3_url: "../identify/static/Webcam/shutter.mp3",
-            swf_url: "../identify/static/Webcam/jpeg_camera.swf"
+
+            shutter_ogg_url: "../static/Webcam/shutter.ogg",
+            shutter_mp3_url: "../static/Webcam/shutter.mp3",
+            swf_url: "../static/Webcam/jpeg_camera.swf"
         }
 
         camera = new JpegCamera("#camera", options).ready(function (info) {

@@ -10,6 +10,11 @@ class Person(models.Model):
     lastLoginPicture = models.FileField(upload_to='lastPhoto/')
     code = models.CharField(max_length=100)
 
+    def as_json(self):
+        return dict(firsName=self.firstName,
+                    lastName=self.lastName,
+                    code=self.code)
+
     def get_absolute_url(self):
         return reverse('identify:detail', kwargs={'pk': self.pk})
 

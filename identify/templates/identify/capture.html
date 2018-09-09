@@ -12,10 +12,10 @@
 
 {% block body %}
 
-    <p>
-        This is a demonstration page for
-        <a href="https://amw.github.io/jpeg_camera/doc/">JpegCamera library</a>.
-    </p>
+{#    <p>#}
+{#        This is a demonstration page for#}
+{#        <a href="https://amw.github.io/jpeg_camera/doc/">JpegCamera library</a>.#}
+{#    </p>#}
     {% if names %}
         <h1>WELCOME {{ names }}</h1>
     {% endif %}
@@ -33,12 +33,20 @@
 
     </div>
 
-    <button id="discard_snapshot" style="display: inline-block;">Discard snapshot</button>
+    <form action="{% url 'identify:capture_api' %}" method="post" id="detectJson">
+        {% csrf_token %}
+        <input type="hidden" name="facePicJson" id="facePicJson">
+    </form>
+
     <form action="{% url 'identify:capture' %}" method="post" id="detect">
         {% csrf_token %}
         <input type="hidden" name="facePic" id="facePic">
     </form>
-    <button id="upload_snapshot" style="display: inline-block;">Upload to URL</button><br>
+
+    <button id="discard_snapshot" style="display: inline-block;">Discard snapshot</button>
+    <button id="upload_snapshot" style="display: inline-block;">Upload</button><br>
+    <button id="upload_snapshot_json" style="display: inline-block;">Upload(JSON)</button><br>
+
     <input type="text" id="api_url" placeholder="https://example.com/upload" style="display: inline-block;"><br>
 
 {#    <img src="loader.gif" id="loader">#}

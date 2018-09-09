@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+from identify.Serializer import PersonSerializer
 from identify.models import Person
 from django.views import generic
 from django.urls import reverse_lazy
@@ -11,11 +13,13 @@ from django.shortcuts import redirect
 import base64
 from django.core.files.base import ContentFile
 from identify.FaceDetection import faceDetection
+from rest_framework.views import APIView, Response
 import uuid
 import os
 
 import numpy
 import face_recognition
+
 
 
 # Create your views here.
@@ -96,18 +100,51 @@ def capture(request):
         return render(request, 'identify/capture.html')
 
     if request.method == 'POST':
-        data = request.POST['facePic']
-        format, imgstr = data.split(';base64,')
-        ext = format.split('/')[-1]
+        try:
+            data = request.POST['facePic']
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
 
-        filename = "recorded/"
-        filename += str(uuid.uuid4())
-        filename += "."+ext
+            filename = "recorded/"
+            filename += str(uuid.uuid4())
+            filename += "." + ext
 
-        imagedata = base64.b64decode(imgstr)
-        fh = open(filename, 'wb')
-        fh.write(imagedata)
+            imagedata = base64.b64decode(imgstr)
+            fh = open(filename, 'wb')
+            fh.write(imagedata)
 
-        names = faceDetection(filename)
-        return render(request, 'identify/capture.html', {'names': names})
+            names, ids = faceDetection(filename)
+            for val in ids:
+                newcommer = Person.objects.filter(id=val)[0]
+                newcommer.lastLoginPicture.save(str(newcommer.id), File(fh))
+            return render(request, 'identify/capture.html', {'names': names})
+        except Exception as e:
+            print(e)
+
+
+
+class capture_api(APIView):
+
+    def post(self, request):
+        try:
+            data = request.POST['facePicJson']
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            filename = "recorded/"
+            filename += str(uuid.uuid4())
+            filename += "." + ext
+
+            imagedata = base64.b64decode(imgstr)
+            fh = open(filename, 'wb')
+            fh.write(imagedata)
+
+            names, ids = faceDetection(filename)
+            result = Person.objects.filter(id__in=ids)
+            serializer = PersonSerializer(result, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(e)
+
+
 
