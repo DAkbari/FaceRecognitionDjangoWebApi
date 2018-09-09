@@ -16,7 +16,9 @@
         This is a demonstration page for
         <a href="https://amw.github.io/jpeg_camera/doc/">JpegCamera library</a>.
     </p>
-
+    {% if names %}
+        <h1>WELCOME {{ names }}</h1>
+    {% endif %}
     <div id="camera_info">Camera resolution: 1280x720</div>
     <div id="stream_stats">Mean luminance = 113; Standard Deviation = 73</div>
 

@@ -4,12 +4,23 @@ import sys
 from PIL import Image, ImageDraw
 from time import sleep
 import time
+import numpy
+from identify.models import Person
 
-
-def faceDetection(picture, personellencodes, personellCodes):
+def faceDetection(picture):
     treshold = 0.6
-    known_face_encodings = []
+    known_face_encodings = list()
 
+    personellCodes = [i[0] for i in Person.objects.values_list('code')]
+    encodes = [i[0] for i in Person.objects.values_list('faceEncode')]
+    fNames = [i[0] for i in Person.objects.values_list('firstName')]
+    lNames = [i[0] for i in Person.objects.values_list('lastName')]
+
+    try:
+        for encode in encodes:
+            known_face_encodings.append(numpy.load("media/" + encode))
+    except Exception as e:
+        print(str(e))
     names = list()
     # Load an image with an unknown face
     try:
@@ -20,7 +31,7 @@ def faceDetection(picture, personellencodes, personellCodes):
     except:
         print("Error in ecoding unknown image!")
 
-    for (top, right, bottom, left), face_encoding in zip(face_locations, personellencodes):
+    for (top, right, bottom, left), face_encoding in zip(face_locations, known_face_encodings):
         # See if the face is a match for the known face(s)
         name = "Unknown"
         try:
@@ -29,12 +40,12 @@ def faceDetection(picture, personellencodes, personellCodes):
                 indices = [i for i, x in enumerate(face_distances) if x == face_distances.min()]
                 # If a match was found in known_face_encodings, just use the first one.
                 if len(indices) == 1:
-                    name = personellCodes[indices[0]]
+                    name = fNames[indices[0]] + " " + lNames[indices[0]]
 
         except:
             print("Error in measuring distance!")
 
         names.append(name)
 
-    return names.join(',')
+    return ','.join(names)
 

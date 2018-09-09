@@ -5,9 +5,9 @@ from django.urls import reverse
 class Person(models.Model):
     firstName = models.CharField(max_length=200)
     lastName = models.CharField(max_length=200)
-    faceEncode = models.CharField(max_length=3000)
-    facePicture = models.FileField()
-    lastLoginPicture = models.FileField()
+    faceEncode = models.FileField(upload_to="encodes/")
+    facePicture = models.FileField(upload_to="faces/")
+    lastLoginPicture = models.FileField(upload_to='lastPhoto/')
     code = models.CharField(max_length=100)
 
     def get_absolute_url(self):

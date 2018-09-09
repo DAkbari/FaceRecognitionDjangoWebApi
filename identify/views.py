@@ -6,9 +6,13 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.views.generic import View
 from identify import forms
+from django.core.files import File
+from django.shortcuts import redirect
 import base64
 from django.core.files.base import ContentFile
 from identify.FaceDetection import faceDetection
+import uuid
+import os
 
 import numpy
 import face_recognition
@@ -44,7 +48,7 @@ class PersonCreate(View):
     form_class = forms.UserForm
     template_name = 'identify/new_person_form.html'
 
-    #display a blink form
+    #display a blank form
     def get(self, request):
         form = self.form_class(None)
         return render(request, self.template_name, {'form': form})
@@ -58,14 +62,20 @@ class PersonCreate(View):
 
             facePicture = form.cleaned_data['facePicture']
             Data_face_image = face_recognition.load_image_file(facePicture)
+            user.save()
 
             try:
-                user.faceEncode = face_recognition.face_encodings(Data_face_image)[0]
-
-            except:
-                print("error")
-
-            user.save()
+                faceEncode = face_recognition.face_encodings(Data_face_image)[0]
+                filename = "numpySave/" + str(user.code)
+                numpy.save(filename, faceEncode)
+                filename += ".npy"
+                f = open(filename)
+                user.faceEncode.save(str(user.id), File(f))
+                f.close()
+                os.remove(filename)
+                user.save()
+            except Exception as e:
+                print(str(e))
 
         return render(request, self.template_name, {'form': form})
 
@@ -89,8 +99,15 @@ def capture(request):
         data = request.POST['imgBase64']
         format, imgstr = data.split(';base64,')
         ext = format.split('/')[-1]
-        data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-        personellCodes = Person.objects.all()
-        faceDetection(data, )
-        return HttpResponse("successful")
+
+        filename = "recorded/"
+        filename += str(uuid.uuid4())
+        filename += "."+ext
+
+        imagedata = base64.b64decode(imgstr)
+        fh = open(filename, 'wb')
+        fh.write(imagedata)
+
+        names = faceDetection(filename)
+        return render(request, 'identify/capture.html', {'names': names})
 

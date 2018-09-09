@@ -85,14 +85,19 @@ $(function () {
                 data: {
                     csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                     imgBase64: dataURL
+                },
+                success: function (data) {
+                    console.log('redirecting')
+                    window.location = data.url
                 }
             }).done(function (o) {
                 console.log('saved');
+
                 // If you want the file to be visible in the browser
                 // - please modify the callback in javascript. All you
                 // need is to return the url to the file, you just saved
                 // and than put the image in your browser.
-            });
+            })
             // snapshot.upload({api_url: 'localhost:8000/identify/capture'}).done(upload_done).fail(upload_fail);
         };
 
