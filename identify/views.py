@@ -96,7 +96,7 @@ def capture(request):
         return render(request, 'identify/capture.html')
 
     if request.method == 'POST':
-        data = request.POST['imgBase64']
+        data = request.POST['facePic']
         format, imgstr = data.split(';base64,')
         ext = format.split('/')[-1]
 
