@@ -14,10 +14,6 @@ def faceDetection():
     detectedIDs = list()
 
     Ids = [i[0] for i in Person.objects.values_list('id')]
-    personellCodes = [i[0] for i in Person.objects.values_list('code')]
-    encodes = [i[0] for i in Person.objects.values_list('faceEncode')]
-    fNames = [i[0] for i in Person.objects.values_list('firstName')]
-    lNames = [i[0] for i in Person.objects.values_list('lastName')]
 
     for iden in Ids:
         try:

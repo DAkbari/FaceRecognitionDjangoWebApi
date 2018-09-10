@@ -119,18 +119,16 @@ def capture(request):
             #     newcommer.lastLoginPicture.save(str(newcommer.id), File(fh))
             names = ""
             for iden in ids:
-                names += Person.objects.filter(id=iden).values_list('firstName')
-                names += ' '
-                names += Person.objects.filter(id=iden).values_list('lastName')
-                names += ','
+                detectedPerson = Person.objects.filter(id=iden).first()
+                names += detectedPerson.firstName + ' ' + detectedPerson.lastName + ','
+            names = names[:len(names) - 1]
+
             return render(request, 'identify/capture.html', {'names': names})
         except Exception as e:
             print(e)
 
 
-
 class capture_api(APIView):
-
     def post(self, request):
         try:
             data = request.POST['facePicJson']
@@ -138,14 +136,15 @@ class capture_api(APIView):
             ext = format.split('/')[-1]
 
             filename = "recorded/"
-            filename += str(uuid.uuid4())
+            filename += "newPhoto"
             filename += "." + ext
 
             imagedata = base64.b64decode(imgstr)
             fh = open(filename, 'wb')
             fh.write(imagedata)
+            fh.close()
 
-            names, ids = faceDetection(filename)
+            ids = faceDetection()
             result = Person.objects.filter(id__in=ids)
             serializer = PersonSerializer(result, many=True)
             return Response(serializer.data)
