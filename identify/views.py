@@ -63,21 +63,20 @@ class PersonCreate(View):
         if form.is_valid():
             user = form.save(commit=False)
             # clean normalized data
-
-            facePicture = form.cleaned_data['facePicture']
-            Data_face_image = face_recognition.load_image_file(facePicture)
+            # facePicture = form.cleaned_data['facePicture']
             user.save()
 
+            Data_face_image = face_recognition.load_image_file(user.facePicture.path)
             try:
                 faceEncode = face_recognition.face_encodings(Data_face_image)[0]
-                filename = "numpySave/" + str(user.code)
+                filename = "numpySave/" + str(user.id)
                 numpy.save(filename, faceEncode)
-                filename += ".npy"
-                f = open(filename)
-                user.faceEncode.save(str(user.id), File(f))
-                f.close()
-                os.remove(filename)
-                user.save()
+
+                # f = open(filename)
+                # user.faceEncode.save(str(user.id), File(f))
+                # f.close()
+                # os.remove(filename)
+                # user.save()
             except Exception as e:
                 print(str(e))
 
@@ -106,17 +105,24 @@ def capture(request):
             ext = format.split('/')[-1]
 
             filename = "recorded/"
-            filename += str(uuid.uuid4())
+            filename += "newPhoto"
             filename += "." + ext
 
             imagedata = base64.b64decode(imgstr)
             fh = open(filename, 'wb')
             fh.write(imagedata)
+            fh.close()
 
-            names, ids = faceDetection(filename)
-            for val in ids:
-                newcommer = Person.objects.filter(id=val)[0]
-                newcommer.lastLoginPicture.save(str(newcommer.id), File(fh))
+            ids = faceDetection()
+            # for val in ids:
+            #     newcommer = Person.objects.filter(id=val)[0]
+            #     newcommer.lastLoginPicture.save(str(newcommer.id), File(fh))
+            names = ""
+            for iden in ids:
+                names += Person.objects.filter(id=iden).values_list('firstName')
+                names += ' '
+                names += Person.objects.filter(id=iden).values_list('lastName')
+                names += ','
             return render(request, 'identify/capture.html', {'names': names})
         except Exception as e:
             print(e)

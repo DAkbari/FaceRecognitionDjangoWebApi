@@ -7,9 +7,10 @@ import time
 import numpy
 from identify.models import Person
 
-def faceDetection(picture):
+def faceDetection():
     treshold = 0.6
     known_face_encodings = list()
+    known_face_ids = list()
     detectedIDs = list()
 
     Ids = [i[0] for i in Person.objects.values_list('id')]
@@ -18,11 +19,13 @@ def faceDetection(picture):
     fNames = [i[0] for i in Person.objects.values_list('firstName')]
     lNames = [i[0] for i in Person.objects.values_list('lastName')]
 
-    try:
-        for encode in encodes:
-            known_face_encodings.append(numpy.load("media/" + encode))
-    except Exception as e:
-        print(str(e))
+    for iden in Ids:
+        try:
+            known_face_encodings.append(numpy.load('numpySave/' + str(iden) + '.npy'))
+            known_face_ids.append(iden)
+        except Exception as e:
+            print(e)
+
 
     people = list()
     names = list()
@@ -30,14 +33,14 @@ def faceDetection(picture):
 
     # Load an image with an unknown face
     try:
-        unknown_image = face_recognition.load_image_file(picture)
+        unknown_image = face_recognition.load_image_file('recorded/newPhoto.png')
         # Find all the faces and face encodings in the unknown image
         face_locations = face_recognition.face_locations(unknown_image)
         face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
     except:
         print("Error in ecoding unknown image!")
 
-    for (top, right, bottom, left), face_encoding in zip(face_locations, known_face_encodings):
+    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
         # See if the face is a match for the known face(s)
         name = "Unknown"
 
@@ -47,14 +50,14 @@ def faceDetection(picture):
                 indices = [i for i, x in enumerate(face_distances) if x == face_distances.min()]
                 # If a match was found in known_face_encodings, just use the first one.
                 if len(indices) == 1:
-                    name = fNames[indices[0]] + " " + lNames[indices[0]]
-                    id = Ids[indices[0]]
+                    # name = fNames[indices[0]] + " " + lNames[indices[0]]
+                    id = known_face_ids[indices[0]]
 
         except:
             print("Error in measuring distance!")
 
         detectedIDs.append(id)
-        names.append(name)
 
-    return ','.join(names), detectedIDs
+
+    return detectedIDs
 
