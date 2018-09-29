@@ -1,5 +1,5 @@
 {% extends 'identify/base.html' %}
-{% block title %} User Registration {% endblock %}
+{% block title %} Test platform {% endblock %}
 
 {#{% block albums_active %} active {% endblock %}#}
 
@@ -12,46 +12,66 @@
 
 {% block body %}
 
-{#    <p>#}
-{#        This is a demonstration page for#}
-{#        <a href="https://amw.github.io/jpeg_camera/doc/">JpegCamera library</a>.#}
-{#    </p>#}
-    {% if names %}
-        <h1>WELCOME {{ names }}</h1>
-    {% endif %}
-    <div id="camera_info">Camera resolution: 1280x720</div>
-    <div id="stream_stats">Mean luminance = 113; Standard Deviation = 73</div>
+    <div style="direction: ltr">
+        {#    <p>#}
+        {#        This is a demonstration page for#}
+        {#        <a href="https://amw.github.io/jpeg_camera/doc/">JpegCamera library</a>.#}
+        {#    </p>#}
+        {% if names %}
+            <h1> {{ names }}</h1>
+            <h1>خوش آمدید</h1>
+        {% endif %}
+        {#    <div id="camera_info">Camera resolution: 1280x720</div>#}
+        {#    <div id="stream_stats">Mean luminance = 113; Standard Deviation = 73</div>#}
 
-    <div id="camera" style="width: 250px; height: 350px">
+        <div id="camera" style="width: 250px; height: 350px">
 
-    </div><br>
+        </div>
+        <br>
 
-    <button id="take_snapshots" style="display: inline-block;">Take more snapshots</button>
-    <button id="show_stream" style="display: inline-block;">Show stream</button><br>
+        <button id="take_snapshots" style="display: inline-block;" class="btn btn-primary">گرفتن عکس
+            &nbsp<span class="glyphicon glyphicon-camera"></span></button>
 
-    <div id="snapshots">
+        <button id="show_stream" style="display: inline-block; " class="btn btn-primary">نمایش دوربین
+            &nbsp<span class="glyphicon glyphicon-record"></span>
+        </button>
+        <br>
 
+        <div id="snapshots">
+
+        </div>
+
+        <form action="{% url 'identify:capture_api' %}" method="post" id="detectJson">
+            {% csrf_token %}
+            <input type="hidden" name="facePicJson" id="facePicJson">
+        </form>
+
+        <form action="{% url 'identify:capture' %}" method="post" id="detect">
+            {% csrf_token %}
+            <input type="hidden" name="facePic" id="facePic">
+        </form>
+
+
+        <button id="upload_snapshot" style="display: inline-block;" class="btn btn-success">
+            بارگذاری
+            &nbsp;
+            <span class="glyphicon glyphicon-upload"></span>
+        </button>
+
+        <button id="upload_snapshot_json" style="display: inline-block; align-content: left;"
+                class="btn btn-success">
+            بارگذاری - JSON
+            &nbsp;
+            <span class="glyphicon glyphicon-upload"></span>
+        </button>
+        {#    <button id="discard_snapshot" style="display: inline-block; visibility: hidden">Discard snapshot</button>#}
+
+        {#    <input type="text" id="api_url" placeholder="https://example.com/upload" style="display: inline-block;"><br>#}
+
+        {#    <img src="loader.gif" id="loader">#}
+        <div id="upload_status"></div>
+        <div id="upload_result"></div>
     </div>
-
-    <form action="{% url 'identify:capture_api' %}" method="post" id="detectJson">
-        {% csrf_token %}
-        <input type="hidden" name="facePicJson" id="facePicJson">
-    </form>
-
-    <form action="{% url 'identify:capture' %}" method="post" id="detect">
-        {% csrf_token %}
-        <input type="hidden" name="facePic" id="facePic">
-    </form>
-
-    <button id="discard_snapshot" style="display: inline-block;">Discard snapshot</button>
-    <button id="upload_snapshot" style="display: inline-block;">Upload</button><br>
-    <button id="upload_snapshot_json" style="display: inline-block;">Upload(JSON)</button><br>
-
-    <input type="text" id="api_url" placeholder="https://example.com/upload" style="display: inline-block;"><br>
-
-{#    <img src="loader.gif" id="loader">#}
-    <div id="upload_status"></div>
-    <div id="upload_result"></div>
 
 
 

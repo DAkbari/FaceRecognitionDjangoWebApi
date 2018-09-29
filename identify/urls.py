@@ -1,14 +1,21 @@
 from django.conf.urls import url
 from . import views
 
+
 app_name = 'identify'
 
 urlpatterns = [
     # /identify/
-    url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^$', views.IndexView.as_view(), {'active_menu': 'List'}, name='index'),
 
     # /identify/new
     url(r'^new/$', views.PersonCreate.as_view(), name='new'),
+
+    url('login/', views.user_login, name='login'),
+
+    url('register', views.user_register, name='register'),
+
+    url('logout/', views.user_logout, name='logout'),
 
     # /identify/capture
     url(r'^capture/$', views.capture, name='capture'),
@@ -23,8 +30,5 @@ urlpatterns = [
     url(r'person/(?P<pk>[0-9]+)/$', views.PersonUpdate.as_view(), name="person-update"),
 
     # /music/album/2/delete/
-    url(r'album/(?P<pk>[0-9]+)/delete/$', views.PersonDelete.as_view(), name="person-delete")
-
-
-
+    url(r'identity/(?P<pk>[0-9]+)/delete/$', views.PersonDelete.as_view(), name="person-delete")
 ]

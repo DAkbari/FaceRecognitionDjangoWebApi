@@ -1,17 +1,19 @@
 {% extends 'identify/base.html' %}
+{% block title %} people info {% endblock %}
 {% block body %}
+{% load l10n %}
     {% for person in all_people %}
                 <div class="col-sm-4 col-lg-2">
                     <div class="thumbnail">
                         <a href="{% url 'identify:detail' person.id %}">
-                            <img src="{{ person.facePicture.url }}" class="img-responsive">
+                            <img src="{{ person.facePicture.url }}" class="img-thumbnail" style="width: 150px; height: 200px">
                         </a>
                         <div class="caption">
-                            <h2>{{ person.firstName }} {{ person.lastName }}</h2>
-                            <h4>{{ person.code }}</h4>
+                            <h4 style="font-family: 'B Koodak'">{{ person.firstName }} {{ person.lastName }}</h4>
+                            <h4>{{ person.code|localize }}</h4>
 
                             <!-- View Details -->
-                            <a href="{% url 'identify:detail' person.id %}" class="btn btn-primary btn-sm" role="button">View Details</a>
+                            <a href="{% url 'identify:detail' person.id %}" class="btn btn-primary btn-sm" role="button">جزئیات</a>
 
                             <!-- Delete Album -->
                             <form action="{% url 'identify:person-delete' person.id%}" method="post" style="display: inline;">
@@ -28,7 +30,7 @@
                             </a>
 
                             <!--Update Person Info-->
-                            <a href="{% url 'identify:person-update' person.id%}" class="btn btn-default">
+                            <a href="{% url 'identify:person-update' person.id%}" class="btn btn-default btn-sm" >
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
 

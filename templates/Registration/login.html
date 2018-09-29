@@ -1,0 +1,26 @@
+{% extends 'Registration/base.html' %}
+{% block body %}
+<div class="row">
+    <div class="col-sm-3">
+        <div class="jumbotron" style="background: rgba(204, 204, 204, 0.5); margin:20px">
+            <div class="container">
+                <form action="{% url 'identify:login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">نام کاربری:</label>
+                        <input class="form-control" type="text" name="username" id="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">گذرواژه:</label>
+                        <input class="form-control" type="text" name="password" id="password">
+                    </div>
+                    <button class="btn btn-primary" type="submit">ورود</button>
+                </form>
+                {% if Error %}
+                    <p style="color: red">{{ Error }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -6,5 +6,15 @@ body{
 }
 
 .navbar-brand{
-    font-family: 'Satisfy', cursive;
+    font-family: 'IranNastaliq', cursive;
+}
+
+@font-face {
+    font-family: IranNastaliq;
+    src: url("../fonts/IranNastaliq.ttf");
+}
+
+@font-face {
+    font-family: B Koodak;
+    src: url("../fonts/B koodak.ttf");
 }

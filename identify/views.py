@@ -1,15 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-
+from django.contrib.auth import authenticate, login, logout
 from identify.Serializer import PersonSerializer
 from identify.models import Person
 from django.views import generic
 from django.urls import reverse_lazy
 from django.views.generic import View
 from identify import forms
+from django.db.models import Q
 from django.core.files import File
 from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 import base64
 from django.core.files.base import ContentFile
 from identify.FaceDetection import faceDetection
@@ -19,18 +22,25 @@ import os
 
 import numpy
 import face_recognition
-
-
-
 # Create your views here.
 
 
-class IndexView(generic.ListView):
+class IndexView(LoginRequiredMixin, generic.ListView):
+    login_url = 'identify/login'
+    redirect_field_name = ''
     template_name = 'identify/index.html'
     context_object_name = 'all_people'
 
     def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Person.objects.filter(Q(code__contains=query) | Q(firstName__contains=query) | Q(lastName__contains=query))
         return Person.objects.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(IndexView, self).get_context_data(**kwargs)
+        context['active_menu'] = 'List'
+        return context
 
 
 class DetailView(generic.DeleteView):
@@ -55,7 +65,7 @@ class PersonCreate(View):
     #display a blank form
     def get(self, request):
         form = self.form_class(None)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'active_menu': 'Create'})
 
         # process form data
     def post(self, request):
@@ -80,7 +90,7 @@ class PersonCreate(View):
             except Exception as e:
                 print(str(e))
 
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'active_menu': 'Create'})
 
 
 class PersonUpdate(UpdateView):
@@ -96,7 +106,7 @@ class PersonDelete(DeleteView):
 def capture(request):
 
     if request.method == 'GET':
-        return render(request, 'identify/capture.html')
+        return render(request, 'identify/capture.html', {'active_menu': 'Capture'})
 
     if request.method == 'POST':
         try:
@@ -123,7 +133,7 @@ def capture(request):
                 names += detectedPerson.firstName + ' ' + detectedPerson.lastName + ','
             names = names[:len(names) - 1]
 
-            return render(request, 'identify/capture.html', {'names': names})
+            return render(request, 'identify/capture.html', {'names': names, 'active_menu': 'Capture'})
         except Exception as e:
             print(e)
 
@@ -152,4 +162,56 @@ class capture_api(APIView):
             print(e)
 
 
+def user_login(request):
+    if request.method == "GET":
+        return render(request, 'Registration/login.html')
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/identify')
+        else:
+            return render(request, 'Registration/login.html', {'Error': 'نام کاربری و یا رمز عبور اشتباه است'})
+
+
+def user_logout(request):
+    logout(request)
+    return render(request, 'Registration/login.html')
+
+
+def user_register(request):
+    # if request.method == "GET":
+    #     return render(request, 'Registration/register.html')
+    # if request.method == "POST":
+    #     firstname = request.POST['first_name']
+    #     lastname = request.POST['last_name']
+    #     username = request.POST['username']
+    #     password = request.POST['password']
+    #     email = request.POST['email']
+    #     user = User.objects.create_user(username, email, password, first_name=firstname, last_name=lastname)
+    #     user.save()
+    #     login(request, user)
+    #     return redirect('/identify')
+    if request.method == "GET":
+        form = forms.NewUser();
+        return render(request, 'Registration/register.html', {'form': form})
+    if request.method == "POST":
+        form = forms.NewUser(request.POST)
+        if form.is_valid():
+
+            existingUser = User.objects.filter(username=form.cleaned_data['username'])
+            if len(existingUser)>0:
+                form.add_error(None, 'نام کاربری قبلا استفاده شده است!')
+                return render(request, 'Registration/register.html', {'form': form})
+            user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['email'],
+                                            form.cleaned_data['password'],
+                                            first_name=form.cleaned_data['first_name'],
+                                            last_name=form.cleaned_data['last_name'])
+            user.save()
+            login(request, user)
+            return redirect('/identify')
+        else:
+            return render(request, 'Registration/register.html', {'form': form})
 

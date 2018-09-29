@@ -26,7 +26,7 @@ SECRET_KEY = 'xzl90q&fu(m+*3fmr)(rizty4w$&qaehjb9&z)slnf#)$dg&xq'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+USE_L10N = True
 
 # Application definition
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'identify.apps.IdentifyConfig',
     'django_cleanup',
     'rest_framework',
+    'captcha'
 ]
 
 MIDDLEWARE = [

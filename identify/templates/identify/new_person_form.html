@@ -8,13 +8,13 @@
         <div class="col-sm-12 col-md-7">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <h3>Create a new account</h3>
+                    <h3>ایجاد شخص جدید</h3>
                     <form class="form-horizontal" action="{% url 'identify:new' %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {% include 'identify/form-template.html' %}
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-10">
-                                <button type="submit" class="btn btn-success">Submit</button>
+                                <button type="submit" class="btn btn-success">ثبت</button>
 
                             </div>
                         </div>

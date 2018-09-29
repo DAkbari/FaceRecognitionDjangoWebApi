@@ -1,0 +1,48 @@
+{% extends 'Registration/base.html' %}
+{% block body %}
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="jumbotron" style="background: rgba(204, 204, 204, 0.5); margin:20px">
+                <div class="container">
+{#                    <form action="{% url 'identify:register' %}" method="post">#}
+{#                        {% csrf_token %}#}
+{#                        <div class="form-group">#}
+{#                            <label for="first_name">نام:</label>#}
+{#                            <input type="text" class="form-control" id="first_name" name="first_name">#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="last_name">نام خانوادگی:</label>#}
+{#                            <input type="text" class="form-control" id="last_name" name="last_name">#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="last_name">پست الکترونیک:</label>#}
+{#                            <input class="form-control" type="email" id="email" name="email">#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="username">نام کاربری:</label>#}
+{#                            <input type="text" class="form-control" id="username" name="username">#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="password">گذرواژه:</label>#}
+{#                            <input type="password" class="form-control" id="password" name="password">#}
+{#                        </div>#}
+{#                        <button class="btn btn-primary" type="submit">ثبت نام</button>#}
+{#                    </form>#}
+                    <form action="{% url 'identify:register' %}" method="post">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        {% for field in form %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                <br>
+                                {{ field }}
+                                <p>{{ field.errors }}</p>
+                            </div>
+                        {% endfor %}
+                    <button type="submit">ثبت اطلاعات</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
