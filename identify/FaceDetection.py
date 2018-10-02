@@ -7,13 +7,13 @@ import time
 import numpy
 from identify.models import Person
 
-def faceDetection():
+def faceDetection(userID):
     treshold = 0.6
     known_face_encodings = list()
     known_face_ids = list()
     detectedIDs = list()
 
-    Ids = [i[0] for i in Person.objects.values_list('id')]
+    Ids = [i[0] for i in Person.objects.filter(associatedUser=userID).values_list('id')]
 
     for iden in Ids:
         try:
@@ -42,17 +42,18 @@ def faceDetection():
 
         try:
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-            if face_distances.min() < treshold:
+            if len(face_distances) > 0 and face_distances.min() < treshold:
                 indices = [i for i, x in enumerate(face_distances) if x == face_distances.min()]
                 # If a match was found in known_face_encodings, just use the first one.
                 if len(indices) == 1:
                     # name = fNames[indices[0]] + " " + lNames[indices[0]]
                     id = known_face_ids[indices[0]]
-
+                    detectedIDs.append(id)
         except:
             print("Error in measuring distance!")
 
-        detectedIDs.append(id)
+
+
 
 
     return detectedIDs

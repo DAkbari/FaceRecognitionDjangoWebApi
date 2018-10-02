@@ -34,8 +34,8 @@ class IndexView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         if query:
-            return Person.objects.filter(Q(code__contains=query) | Q(firstName__contains=query) | Q(lastName__contains=query))
-        return Person.objects.all()
+            return Person.objects.filter(Q(code__contains=query) | Q(firstName__contains=query) | Q(lastName__contains=query) & Q(associatedUser=self.request.user))
+        return Person.objects.filter(associatedUser=self.request.user)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
@@ -72,6 +72,7 @@ class PersonCreate(View):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
+            user.associatedUser = self.request.user
             # clean normalized data
             # facePicture = form.cleaned_data['facePicture']
             user.save()
@@ -89,8 +90,18 @@ class PersonCreate(View):
                 # user.save()
             except Exception as e:
                 print(str(e))
-
         return render(request, self.template_name, {'form': form, 'active_menu': 'Create'})
+
+
+def PersonUpdate2(request, pk):
+    if request.method == "GET":
+        person = Person.objects.filter(id=pk)[0]
+        form = forms.UserForm()
+        form.firstName = person.firstName
+        form.lastName = person.lastName
+        form.code = person.code
+        form.facePicture = person.facePicture
+        return render(request, 'identify/edit_person_form.html', {'form': form})
 
 
 class PersonUpdate(UpdateView):
@@ -123,7 +134,7 @@ def capture(request):
             fh.write(imagedata)
             fh.close()
 
-            ids = faceDetection()
+            ids = faceDetection(request.user)
             # for val in ids:
             #     newcommer = Person.objects.filter(id=val)[0]
             #     newcommer.lastLoginPicture.save(str(newcommer.id), File(fh))
@@ -131,6 +142,7 @@ def capture(request):
             for iden in ids:
                 detectedPerson = Person.objects.filter(id=iden).first()
                 names += detectedPerson.firstName + ' ' + detectedPerson.lastName + ','
+
             names = names[:len(names) - 1]
 
             return render(request, 'identify/capture.html', {'names': names, 'active_menu': 'Capture'})
@@ -154,7 +166,7 @@ class capture_api(APIView):
             fh.write(imagedata)
             fh.close()
 
-            ids = faceDetection()
+            ids = faceDetection(self.request.user)
             result = Person.objects.filter(id__in=ids)
             serializer = PersonSerializer(result, many=True)
             return Response(serializer.data)

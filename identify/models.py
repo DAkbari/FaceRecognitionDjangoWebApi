@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-
+from django.contrib.auth.models import User
 
 
 class Person(models.Model):
@@ -10,6 +10,7 @@ class Person(models.Model):
     facePicture = models.FileField(upload_to="faces/")
     lastLoginPicture = models.FileField(upload_to='lastPhoto/')
     code = models.CharField(max_length=100)
+    associatedUser = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def as_json(self):
         return dict(firsName=self.firstName,
