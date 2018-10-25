@@ -76,37 +76,20 @@ class PersonCreate(View):
             # clean normalized data
             # facePicture = form.cleaned_data['facePicture']
             user.save()
-
-            Data_face_image = face_recognition.load_image_file(user.facePicture.path)
-            try:
-                faceEncode = face_recognition.face_encodings(Data_face_image)[0]
-                filename = "numpySave/" + str(user.id)
-                numpy.save(filename, faceEncode)
-
-                # f = open(filename)
-                # user.faceEncode.save(str(user.id), File(f))
-                # f.close()
-                # os.remove(filename)
-                # user.save()
-            except Exception as e:
-                print(str(e))
-        return render(request, self.template_name, {'form': form, 'active_menu': 'Create'})
-
-
-def PersonUpdate2(request, pk):
-    if request.method == "GET":
-        person = Person.objects.filter(id=pk)[0]
-        form = forms.UserForm()
-        form.firstName = person.firstName
-        form.lastName = person.lastName
-        form.code = person.code
-        form.facePicture = person.facePicture
-        return render(request, 'identify/edit_person_form.html', {'form': form})
+            saveEncode(user)
+        # return render(request, self.template_name, {'form': form, 'active_menu': 'Create'})
+        return redirect('identify:index')
 
 
 class PersonUpdate(UpdateView):
     model = Person
     fields = ['firstName', 'lastName', 'facePicture', 'code']
+
+    def form_valid(self, form):
+        person = form.save(commit=False)
+        person.save()
+        saveEncode(person)
+        return redirect('identify:index')
 
 
 class PersonDelete(DeleteView):
@@ -115,7 +98,6 @@ class PersonDelete(DeleteView):
 
 
 def capture(request):
-
     if request.method == 'GET':
         return render(request, 'identify/capture.html', {'active_menu': 'Capture'})
 
@@ -227,3 +209,19 @@ def user_register(request):
         else:
             return render(request, 'Registration/register.html', {'form': form})
 
+
+def saveEncode(user):
+    filepath = user.facePicture.path
+    Data_face_image = face_recognition.load_image_file(user.facePicture.path)
+    try:
+        faceEncode = face_recognition.face_encodings(Data_face_image)[0]
+        filename = "numpySave/" + str(user.id)
+        numpy.save(filename, faceEncode)
+
+        # f = open(filename)
+        # user.faceEncode.save(str(user.id), File(f))
+        # f.close()
+        # os.remove(filename)
+        # user.save()
+    except Exception as e:
+        print(str(e))

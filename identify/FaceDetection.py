@@ -8,7 +8,7 @@ import numpy
 from identify.models import Person
 
 def faceDetection(userID):
-    treshold = 0.6
+    treshold = 0.5
     known_face_encodings = list()
     known_face_ids = list()
     detectedIDs = list()
